@@ -1,7 +1,4 @@
 node_modules/
 dist/
-
-# Keep photos and music out of the main branch
-# (they still get deployed via the built dist/ folder)
-public/photos/
-public/music/
+# Windows metadata files created by WSL
+*:Zone.Identifier

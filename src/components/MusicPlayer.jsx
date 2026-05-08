@@ -12,7 +12,7 @@ const songs = [
   // { title: 'Your Song',         artist: 'Elton John',       file: '/music/your-song.mp3' },
 ];
 
-export default function MusicPlayer() {
+export default function MusicPlayer({ autoPlay = false }) {
   const [visible, setVisible]       = useState(true);
   const [isPlaying, setIsPlaying]   = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -22,19 +22,33 @@ export default function MusicPlayer() {
 
   const song = songs[currentIdx] ?? null;
 
+  /* Load song whenever index changes */
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !song) return;
     audio.volume = volume;
-    if (song) {
-      audio.src = song.file;
-      if (isPlaying) audio.play().catch(() => {});
-    }
-  }, [currentIdx, song]);
+    audio.src = song.file;
+    if (isPlaying) audio.play().catch(() => {});
+  }, [currentIdx]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume]);
+
+  /* Autoplay once the launch sequence finishes (user has already interacted) */
+  useEffect(() => {
+    if (!autoPlay || !songs.length) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.src = songs[0].file;
+    audio.volume = volume;
+    const t = setTimeout(() => {
+      audio.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {}); // silently ignore if browser still blocks
+    }, 600);
+    return () => clearTimeout(t);
+  }, [autoPlay]);
 
   const togglePlay = () => {
     if (!songs.length) return;
@@ -53,6 +67,16 @@ export default function MusicPlayer() {
   };
 
   const next = () => setCurrentIdx(i => (i + 1) % songs.length);
+
+  /* Loop: single song restarts itself; playlist wraps via next() */
+  const onEnded = () => {
+    if (songs.length <= 1) {
+      const a = audioRef.current;
+      if (a) { a.currentTime = 0; a.play().catch(() => {}); }
+    } else {
+      next();
+    }
+  };
 
   const onTimeUpdate = () => {
     const a = audioRef.current;
@@ -148,7 +172,7 @@ export default function MusicPlayer() {
         <audio
           ref={audioRef}
           onTimeUpdate={onTimeUpdate}
-          onEnded={next}
+          onEnded={onEnded}
         />
       </motion.div>
     </AnimatePresence>

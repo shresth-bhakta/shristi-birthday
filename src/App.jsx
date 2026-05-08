@@ -30,7 +30,7 @@ export default function App() {
         <p>Made with love, just for you ✨</p>
         <p className="footer-sub">because you deserve to know how special you are</p>
       </footer>
-      <MusicPlayer />
+      <MusicPlayer autoPlay={launched} />
 
       {/* Launch sequence sits on top until dismissed */}
       {!launched && <LaunchSequence onComplete={() => setLaunched(true)} />}

@@ -36,19 +36,31 @@ export default function MusicPlayer({ autoPlay = false }) {
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume]);
 
-  /* Autoplay once the launch sequence finishes (user has already interacted) */
+  /* Autoplay once the launch sequence finishes; fall back to first click if browser blocks */
   useEffect(() => {
     if (!autoPlay || !songs.length) return;
     const audio = audioRef.current;
     if (!audio) return;
     audio.src = songs[0].file;
     audio.volume = volume;
-    const t = setTimeout(() => {
+
+    let onInteract;
+    const tryPlay = () => {
       audio.play()
         .then(() => setIsPlaying(true))
-        .catch(() => {}); // silently ignore if browser still blocks
-    }, 600);
-    return () => clearTimeout(t);
+        .catch(() => {
+          onInteract = () => {
+            audio.play().then(() => setIsPlaying(true)).catch(() => {});
+          };
+          document.addEventListener('click', onInteract, { once: true });
+        });
+    };
+
+    const t = setTimeout(tryPlay, 600);
+    return () => {
+      clearTimeout(t);
+      if (onInteract) document.removeEventListener('click', onInteract);
+    };
   }, [autoPlay]);
 
   const togglePlay = () => {

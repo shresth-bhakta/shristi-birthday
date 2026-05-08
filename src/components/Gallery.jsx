@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HeicImg from './HeicImg';
 
+const toUrl = (path) => import.meta.env.BASE_URL + path.replace(/^\//, '');
+
 /*
  * ✏️  HOW TO ADD MEMORIES
  * 1. Put your photo in  public/photos/memory1.jpg  (etc.)
@@ -162,7 +164,7 @@ function PhotoCard({ memory, tilt, onClick }) {
           </div>
         ) : (
           <HeicImg
-            src={memory.file}
+            src={toUrl(memory.file)}
             alt={memory.title}
             style={styles.photo}
             onError={() => setFailed(true)}
@@ -205,7 +207,7 @@ function LetterModal({ memory, onClose }) {
         <div style={styles.modalPhoto}>
           {!failed && (
             <HeicImg
-              src={memory.file}
+              src={toUrl(memory.file)}
               alt={memory.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '12px 0 0 12px' }}
               onError={() => setFailed(true)}

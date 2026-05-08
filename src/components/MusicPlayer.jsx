@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
  * 1. Put your .mp3 files in  public/music/
  * 2. Add entries here: { title: 'Song Name', artist: 'Artist', file: '/music/filename.mp3' }
  */
+const BASE = import.meta.env.BASE_URL;
 const songs = [
-  { title: 'Your song',           artist: ':)',       file: '/music/fly.mp3' },
+  { title: 'Your song',           artist: ':)',       file: `${BASE}music/fly.mp3` },
   // { title: 'A Thousand Years',  artist: 'Christina Perri',  file: '/music/thousand-years.mp3' },
   // { title: 'Your Song',         artist: 'Elton John',       file: '/music/your-song.mp3' },
 ];
